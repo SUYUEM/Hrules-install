@@ -536,6 +536,7 @@ draw_menu() {
     menu_item 13 'Hysteria2 设置'
     menu_item 14 '出口代理管理'
     menu_item 15 '脚本更新'
+    menu_heading '系统工具'
     menu_item 16 'BBRv3 加速'
     menu_item 17 '系统软件包更新'
     menu_item 18 'SSH 防御'
