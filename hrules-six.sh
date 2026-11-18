@@ -622,7 +622,7 @@ draw_menu() {
 
 menu() {
     initialize_menu_shortcut
-    local choice confirm
+    local choice
     while true; do
         if [[ -t 1 && ${TERM:-dumb} != dumb ]]; then
             printf '\033[H\033[2J'
@@ -653,10 +653,7 @@ menu() {
             20) if guided_ssh_defense; then continue; fi ;;
             21) if guided_performance; then continue; fi ;;
             22)
-                printf '%s\n' '重启整台 VPS 会断开 SSH，并短暂中断服务。'
-                read -r -p '确认重启？输入 y 确认，回车取消  ' confirm || return 0
-                [[ $confirm == [yY] ]] || continue
-                if systemctl reboot; then
+                if sudo reboot; then
                     printf '%s\n' '已提交重启请求。'
                     return 0
                 fi
