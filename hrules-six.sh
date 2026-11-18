@@ -575,6 +575,8 @@ draw_menu() {
     if [[ -z $key && ! -e $shortcut_record && ! -L $shortcut_record ]] && shortcut_taken m; then
         printf '%s\n' '  m 已被占用，可在菜单 17 修改快捷命令。'
     fi
+    printf '\n'
+    menu_item 22 '重启服务器'
     menu_heading '部署与订阅'
     menu_item 1 '安装 / 更新协议服务（含节点管理）'
     menu_item 2 '服务状态与故障自查'
@@ -609,13 +611,13 @@ draw_menu() {
 
 menu() {
     initialize_menu_shortcut
-    local choice
+    local choice confirm
     while true; do
         if [[ -t 1 && ${TERM:-dumb} != dumb ]]; then
             printf '\033[H\033[2J'
         fi
         draw_menu
-        read -r -p '请选择 [0–21]  ' choice || return 0
+        read -r -p '请选择 [0–22]  ' choice || return 0
         printf '\n'
         case $choice in
             1) if guided_install; then continue; fi ;;
@@ -639,6 +641,16 @@ menu() {
             19) run_installer system-update --yes ;;
             20) if guided_ssh_defense; then continue; fi ;;
             21) if guided_performance; then continue; fi ;;
+            22)
+                printf '%s\n' '重启整台 VPS 会断开 SSH，并短暂中断服务。'
+                read -r -p '确认重启？输入 y 确认，回车取消  ' confirm || return 0
+                [[ $confirm == [yY] ]] || continue
+                if systemctl reboot; then
+                    printf '%s\n' '已提交重启请求。'
+                    return 0
+                fi
+                printf '%s\n' '提交重启请求失败，请查看上面的系统报错。' >&2
+                ;;
             0) return 0 ;;
             *) printf '%s\n' '请选择菜单上的数字。' ;;
         esac
